@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our First Year</title>
+    <link rel="icon" href="/imagens/coracao.jfif">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f5f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f8f5f2"/><path d="M0 20 L100 20" stroke="%23e8e4e1" stroke-width="0.5"/><path d="M0 40 L100 40" stroke="%23e8e4e1" stroke-width="0.5"/><path d="M0 60 L100 60" stroke="%23e8e4e1" stroke-width="0.5"/><path d="M0 80 L100 80" stroke="%23e8e4e1" stroke-width="0.5"/><path d="M20 0 L20 100" stroke="%23e8e4e1" stroke-width="0.5"/><path d="M40 0 L40 100" stroke="%23e8e4e1" stroke-width="0.5"/><path d="M60 0 L60 100" stroke="%23e8e4e1" stroke-width="0.5"/><path d="M80 0 L80 100" stroke="%23e8e4e1" stroke-width="0.5"/></svg>');
+        }
+        
+        .book-container {
+            position: relative;
+            width: 1024px;
+            height: 800px;
+            perspective: 1500px;
+            margin: 50px auto;
+        }
+        
+        .book {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+            transition: transform 0.5s;
+        }
+        
+        .paper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            border-radius: 0 10px 10px 0;
+            background: #fff;
+        }
+        
+        .paper.flipped {
+            transform: rotateY(-180deg);
+        }
+        
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            background-color: white;
+            border-radius: 0 10px 10px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .back {
+            transform: rotateY(180deg);
+        }
+        
+        .page-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-btn {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background-color: #f5c6cb;
+            transform: translateY(-3px);
+        }
+        
+        .nav-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #8c7851;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: -1;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%238c7851"/><circle cx="20" cy="20" r="3" fill="%23a18e63"/><circle cx="50" cy="20" r="3" fill="%23a18e63"/><circle cx="80" cy="20" r="3" fill="%23a18e63"/><circle cx="20" cy="50" r="3" fill="%23a18e63"/><circle cx="50" cy="50" r="3" fill="%23a18e63"/><circle cx="80" cy="50" r="3" fill="%23a18e63"/><circle cx="20" cy="80" r="3" fill="%23a18e63"/><circle cx="50" cy="80" r="3" fill="%23a18e63"/><circle cx="80" cy="80" r="3" fill="%23a18e63"/></svg>');
+            font-family: 'Brush Script MT', cursive;
+        }
+        
+        .book-spine {
+            position: absolute;
+            width: 40px;
+            height: 100%;
+            left: -40px;
+            top: 0;
+            background-color: #363535;
+            border-radius: 10px 0 0 10px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .scrapbook-element {
+            position: absolute;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .photo-frame {
+            background-color: white;
+            border: none;
+            box-shadow: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .tape {
+            position: absolute;
+            width: 80px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.6);
+            transform: rotate(var(--rotation, 0deg));
+            z-index: 10;
+        }
+        
+        .note {
+            background-color: #fff9c4;
+            padding: 15px;
+            width: 150px;
+            transform: rotate(var(--rotation, 2deg));
+            font-size: 14px;
+            font-family: 'Comic Sans MS', cursive;
+            line-height: 1.4;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        
+        .sticker {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform: rotate(var(--rotation, 0deg));
+        }
+        
+        .page-number {
+            position: absolute;
+            bottom: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f5f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #8c7851;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Carregando seu scrapbook...</h2>
+        </div>
+    </div>
+
+    <div class="book-container">
+        <div class="book-spine"></div>
+        <div class="book">
+            <!-- Capa do livro -->
+            <div class="book-cover">
+                <h1 style="font-size: 48px; margin-bottom: 20px;">Fim...Por enquanto.</h1>
+               
+            </div>
+            
+            <!-- Página 1 -->
+            <div class="paper" id="p1">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/capa.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back"> 
+                </div>
+            </div>
+            
+            <!-- Página 2 -->
+            <div class="paper" id="p2">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/2.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back">      
+                </div>
+            </div>
+            
+            <!-- Página 3 -->
+            <div class="paper" id="p3">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/1 ANO.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back">
+                </div>
+            </div>
+
+              <!-- Página 4 -->
+            <div class="paper" id="p4">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/4.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back">
+                </div>
+            </div>
+
+              <!-- Página 5 -->
+            <div class="paper" id="p5">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/5.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back">
+                </div>
+            </div>
+
+              <!-- Página 6 -->
+            <div class="paper" id="p6">
+                <div class="front">
+                    <div class="page-content">
+                      <a href="https://open.spotify.com/playlist/64sUgWxKSx5DosWxilog5T?si=FWekjDmkTwuLCqxO9EtnoQ">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/6.png" alt="placeholder" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="back">
+                </div>
+            </div>
+
+              <!-- Página 7 -->
+            <div class="paper" id="p7">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/7.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back">
+                </div>
+            </div>
+
+              <!-- Página 8 -->
+            <div class="paper" id="p8">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/8.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back">
+                </div>
+            </div>
+
+              <!-- Página 9 -->
+            <div class="paper" id="p9">
+                <div class="front">
+                    <div class="page-content">
+                        <div class="photo-frame" style="--rotation: 0deg; width: 100%; height: 100%; top: 0; left: 0; transform: none; border: none; box-shadow: none;">
+                            <img src="/imagens/9.png" alt="placeholder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="back">
+                </div>
+            </div>
+            
+            <!-- Página 10 -->
+            <div class="paper" id="p10">
+                <div class="front">
+                    <div class="page-content">
+                        
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(255, 255, 255, 0.8); padding: 30px; border-radius: 10px; max-width: 80%; text-align: center; z-index: 5;">
+                            <h2 style="margin-bottom: 24px; font-family: 'Comic Sans MS', cursive; color: #8c7851;">Uma carta para você</h2>
+                            <p style="font-family: 'Comic Sans MS', cursive; line-height: 1.6; margin-bottom: 24px;">
+                                Amorzinho,<br><br>
+                                Estas páginas guardam momentos especiais que compartilhamos juntos. 
+                                Cada foto, cada lembrança, representa um pedaço da nossa história.
+                                Espero que este scrapbook digital traga um sorriso ao seu rosto 
+                                e aqueça seu coração, assim como você aquece o meu.<br><br>
+                                Com carinho,<br>
+                                Karen
+                            </p>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="back">
+                   
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="navigation">
+        <button class="nav-btn prev-btn" id="prevBtn">←</button>
+        <button class="nav-btn next-btn" id="nextBtn">→</button>
+    </div>
+
+    <script>
+        // Carregar a página
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                }, 500);
+            }, 1500);
+        });
+        
+        // Configuração do scrapbook
+        const papers = Array.from(document.querySelectorAll('.paper'));
+        let currentPage = 0;
+        
+        // Inicializa o livro (todas as páginas viradas exceto a capa)
+        papers.forEach(paper => {
+            paper.style.zIndex = papers.length - papers.indexOf(paper);
+        });
+        
+        // Botões de navegação
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                // Voltar uma página
+                papers[currentPage - 1].classList.remove('flipped');
+                currentPage--;
+                updateButtons();
+                
+            }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < papers.length) {
+                // Avançar uma página
+                papers[currentPage].classList.add('flipped');
+                currentPage++;
+                updateButtons();
+                
+            }
+        });
+        
+        // Atualiza o estado dos botões
+        function updateButtons() {
+            prevBtn.disabled = currentPage === 0;
+            prevBtn.style.opacity = currentPage === 0 ? '0.5' : '1';
+            nextBtn.disabled = currentPage === papers.length;
+            nextBtn.style.opacity = currentPage === papers.length ? '0.5' : '1';
+        }
+        
+    
+        
+        // Inicialização
+        updateButtons();
+    </script>
+</body>
+</html>
